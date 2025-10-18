@@ -17,7 +17,7 @@ services:
 
       # ✅ PostgreSQL connection
       - key: DB_HOST
-        value: dpg-d3pteifdiees73c4juf0-a.render.com
+        value: dpg-d3pteifdiees73c4juf0-a.summer_medical-db.internal
       - key: DB_PORT
         value: 5432
       - key: DB_USER
