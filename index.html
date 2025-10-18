@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summer Medical Center</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+<header class="bg-blue-600 text-white p-6">
+    <h1 class="text-4xl font-bold">Summer Medical Center</h1>
+    <p class="text-lg">Discover Your Future in Medicine!</p>
+    <nav class="mt-4">
+        <ul class="flex space-x-4">
+            <li><a href="#about" class="hover:underline">About</a></li>
+            <li><a href="#contacts" class="hover:underline">Contacts</a></li>
+            <li><a href="#registration" class="hover:underline">Registration</a></li>
+            <li><a href="#faq" class="hover:underline">FAQ</a></li>
+            <li><a href="#services" class="hover:underline">Services</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="p-6">
+    <section class="hero bg-white p-6 rounded shadow-md">
+        <img src="https://via.placeholder.com/800x400" alt="Medical Exploration" class="w-full rounded">
+        <p class="mt-4">At Summer Medical Center, we offer laboratory services, orthopedics, and sonography to help you explore the medical field.</p>
+        <a href="#registration" class="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded">Register Now!</a>
+    </section>
+
+    <section id="about" class="mt-6">
+        <h2 class="text-2xl font-bold">Health is Wealth</h2>
+        <p>Our center is dedicated to long-term investments in personal health. We are open from 9 AM to 5 PM, located at 123 Health St. Our overall objective is to empower students with knowledge and skills in the medical field.</p>
+    </section>
+
+    <section id="services" class="mt-6">
+        <h2 class="text-2xl font-bold">Program Details</h2>
+        <ul class="list-disc ml-6">
+            <li>Anatomy & Physiology</li>
+            <li>Medical Terminology Basics</li>
+            <li>Hands-on Simulations</li>
+            <li>Guest Lectures from Medical Professionals</li>
+            <li>Shadowing Opportunities (if applicable)</li>
+        </ul>
+    </section>
+
+    <section id="registration" class="mt-6">
+        <h2 class="text-2xl font-bold">Registration</h2>
+        <form id="registrationForm" class="bg-white p-6 rounded shadow-md">
+            <input type="text" placeholder="First Name" required class="block w-full mb-4 p-2 border">
+            <input type="text" placeholder="Last Name" required class="block w-full mb-4 p-2 border">
+            <input type="email" placeholder="Email Address" required class="block w-full mb-4 p-2 border">
+            <input type="tel" placeholder="Phone Number" required class="block w-full mb-4 p-2 border">
+            <select required class="block w-full mb-4 p-2 border">
+                <option value="">Select Grade Level</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+            <input type="password" placeholder="Password" required class="block w-full mb-4 p-2 border">
+            <input type="password" placeholder="Confirm Password" required class="block w-full mb-4 p-2 border">
+            <div class="mb-4">
+                <label><input type="radio" name="subscription" value="Basic" required> Basic - Kes 500 (includes summer online care access)</label><br>
+                <label><input type="radio" name="subscription" value="Premium" required> Premium - Kes 5000 (includes access + exclusive materials)</label>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded">Register</button>
+        </form>
+        <div id="otpVerification" class="hidden mt-4">
+            <p>Verification Code Sent to Your Phone Number.</p>
+            <input type="text" placeholder="Enter OTP" class="block w-full mb-4 p-2 border">
+            <button class="bg-blue-600 text-white py-2 px-4 rounded">Verify OTP</button>
+        </div>
+    </section>
+
+    <section id="faq" class="mt-6">
+        <h2 class="text-2xl font-bold">Frequently Asked Questions</h2>
+        <ul class="list-disc ml-6">
+            <li>What is the duration of the program?</li>
+            <li>Are there any prerequisites for registration?</li>
+            <li>Can I change my subscription plan after registration?</li>
+        </ul>
+    </section>
+</main>
+
+<footer class="bg-blue-600 text-white p-6 mt-6">
+    <p>&copy; 2023 Summer Medical Center. All rights reserved.</p>
+    <p>Contact us: info@summermedicalcenter.com | Phone: 123-456-7890</p>
+    <p>Follow us on <a href="#" class="underline">Facebook</a>, <a href="#" class="underline">Twitter</a>, <a href="#" class="underline">Instagram</a></p>
+</footer>
+
+<script>
+    document.getElementById('registrationForm').onsubmit = function(event) {
+        event.preventDefault();
+        alert('Form submitted successfully!');
+        document.getElementById('otpVerification').classList.remove('hidden');
+    };
+</script>
+
+</body>
+</html>
