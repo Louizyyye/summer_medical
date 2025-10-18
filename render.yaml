@@ -22,7 +22,22 @@ services:
         value: summer_medical
       - key: CORS_ORIGIN
         value: https://Louizyyye.github.com
-
+      - key: PORT
+         value: 5432
+      - key: DB_HOST
+         value: dpg-d3pteifdiees73c4juf0-a
+      - key: DB_USER
+         value: summer_medical_user
+      - key: DB_PASS
+          value: uqx2gVQUUZV5RSWV8s1sRuBxqStRIBmH
+      - key: DB_NAME
+           value: summer_medical
+      - key: AT_API_KEY
+           value: your-africastalking-api-key
+      - key: AT_USERNAME
+          value: your-africastalking-username
+      - key: AT_SENDER_ID
+          value: your-approved-sender-id
 databases:
   - name: summer_medical
     plan: free

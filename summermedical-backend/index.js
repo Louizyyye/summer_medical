@@ -1,108 +1,69 @@
-// =========================
-// Backend Entry Point
-// =========================
-
+// index.js
+require("dotenv").config();
 const express = require("express");
-const mysql = require("mysql2");
 const cors = require("cors");
-const path = require("path");
-const africastalking = require("africastalking")
-const dotenv = require("dotenv")
+const mysql = require("mysql2");
+const Africastalking = require("africastalking");
 
-dotenv.config();
-
-
+// Initialize app
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Middleware
-app.use(cors({
-  origin: "https://Louizyyye.github.com",
-  methods: ["GET", "POST"],
-  credentials: true
-}));
-
+app.use(cors());
 app.use(express.json());
 
-// =========================
-// MySQL Connection
-// =========================
-
+// ✅ Connect to MySQL
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root", // change this
-  database: "summer_medical", // change this to your actual DB
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
 });
 
 db.connect((err) => {
   if (err) {
-    console.error("❌ Error connecting to MySQL:", err.message);
+    console.error("❌ MySQL Connection Error:", err);
   } else {
-    console.log("✅ Connected to MySQL database.");
+    console.log("✅ Connected to MySQL Database");
   }
 });
 
-// =========================
-// API Routes
-// =========================
-
-app.get("/api", (req, res) => {
-  res.send("Backend is running and connected to MySQL!");
-});
-
-// Example query route
-app.get("/api/patients", (req, res) => {
-  db.query("SELECT * FROM patients", (err, results) => {
-    if (err) {
-      console.error("Database query error:", err);
-      res.status(500).json({ error: "Database error" });
-    } else {
-      res.json(results);
-    }
-  });
-});
-
-
-// =========================
-// Frontend Serving (for production)
-// =========================
-
-// If you ever build the frontend locally (e.g., React → build folder)
-app.use(express.static(path.join(__dirname, "build")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
-
-const at = africastalking({
+// ✅ Initialize Africa's Talking
+const africastalking = Africastalking({
   apiKey: process.env.AT_API_KEY,
   username: process.env.AT_USERNAME,
 });
 
-const sms = at.SMS;
+const sms = africastalking.SMS;
 
+// ✅ Send OTP Endpoint
 app.post("/api/send-otp", async (req, res) => {
-  const { phone } = req.body;
-  const otp = Math.floor(100000 + Math.random() * 900000);
-
   try {
-    const response = await sms.send({
-      to: [phone],
-      message: `Your Summer Medical OTP is ${otp}`,
+    const { phone } = req.body;
+    if (!phone) return res.status(400).json({ success: false, message: "Phone number required" });
+
+    const otp = require("crypto").randomInt(100000, 999999);
+    const message = `Your Summer Medical verification code is ${otp}`;
+
+    const result = await sms.send({
+      to: phone,
+      message,
+      from: process.env.AT_SENDER_ID || "",
     });
 
-    console.log("✅ OTP sent:", response);
-    res.json({ success: true });
-  } catch (err) {
-    console.error("❌ OTP failed:", err);
-    res.status(500).json({ success: false, error: err.message });
+    console.log("📲 OTP sent to:", phone, result);
+    res.json({ success: true, message: "OTP sent successfully", otp });
+  } catch (error) {
+    console.error("❌ Error sending OTP:", error);
+    res.status(500).json({ success: false, message: "Failed to send OTP" });
   }
 });
-// =========================
-// Start Server
-// =========================
 
+// ✅ Root route for health check
+app.get("/", (req, res) => {
+  res.send("✅ Summer Medical Backend (Africa's Talking) is running");
+});
+
+// ✅ Start server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
