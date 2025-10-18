@@ -1,20 +1,27 @@
 // =========================
 // Backend Entry Point
 // =========================
-import africastalking from "africastalking";
-import dotenv from "dotenv";
-dotenv.config();
 
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
 const path = require("path");
+const africastalking = require("africastalking")
+const dotenv = require("dotenv")
+
+dotenv.config();
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "https://Louizyyye.github.com",
+  methods: ["GET", "POST"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // =========================
