@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://summermedical-backend.onrender.com"; // backend server
+const API_BASE_URL = "https://summermedical-backend.onrender.com/api"; // backend server
 
 
 fetch(`${API_BASE_URL}/patients`)
