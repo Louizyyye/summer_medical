@@ -26,6 +26,8 @@ services:
         value: uqx2gVQUUZV5RSWV8s1sRuBxqStRIBmH
       - key: DB_NAME
         value: summer_medical
+      - key: DATABASE_URL
+        value: postgresql://summer_medical_user:uqx2gVQUUZV5RSWV8s1sRuBxqStRIBmH@dpg-d3pteifdiees73c4juf0-a.render.com/summer_medical
 
       # ✅ Africa's Talking
       - key: AT_API_KEY
