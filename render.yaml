@@ -2,41 +2,39 @@ services:
   - type: web
     name: summermedical-backend
     env: node
-    buildCommand: cd summermedical-backend && npm install
-    startCommand: cd summermedical-backend && node index.js
     plan: free
     branch: main
     autoDeploy: true
+    buildCommand: cd summermedical-backend && npm install
+    startCommand: cd summermedical-backend && node index.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 3606
+        value: 3000
+      - key: CORS_ORIGIN
+        value: https://louizyyye.github.io
+
+      # ✅ PostgreSQL connection
       - key: DB_HOST
-        value: localhost
+        value: dpg-d3pteifdiees73c4juf0-a.render.com
+      - key: DB_PORT
+        value: 5432
       - key: DB_USER
-        value: summer_user
-      - key: DB_PASSWORD
-        value: root
+        value: summer_medical_user
+      - key: DB_PASS
+        value: uqx2gVQUUZV5RSWV8s1sRuBxqStRIBmH
       - key: DB_NAME
         value: summer_medical
-      - key: CORS_ORIGIN
-        value: https://Louizyyye.github.com
-      - key: PORT
-         value: 3000
-      - key: DB_HOST
-         value: dpg-d3pteifdiees73c4juf0-a
-      - key: DB_USER
-         value: summer_medical_user
-      - key: DB_PASS
-          value: uqx2gVQUUZV5RSWV8s1sRuBxqStRIBmH
-      - key: DB_NAME
-           value: summer_medical
+
+      # ✅ Africa's Talking
       - key: AT_API_KEY
-           value: your-africastalking-api-key
+        value: atsk_824efeb296fdfab2cfa893b2e3291ecbac621cb450a67c1004b9707289f1c7fd0b95546d
       - key: AT_USERNAME
-          value: your-africastalking-username
+        value: casterlui
+      - key: AT_SENDER_ID
+        value:
 
-
-- name: summer_medical
-  plan: free
+databases:
+  - name: summer_medical
+    plan: free
