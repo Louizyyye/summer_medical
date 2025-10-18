@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3000/api"; // backend server
+const API_BASE_URL = "https://summermedical-backend.onrender.com"; // backend server
 
 
 fetch(`${API_BASE_URL}/patients`)
