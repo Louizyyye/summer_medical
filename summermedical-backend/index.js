@@ -1,47 +1,34 @@
-// index.js
-require("dotenv").config();
+/require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
 const Africastalking = require("africastalking");
 
-const allowed = [
-  'https://Louizyyye.github.io',
-  'https://Louzyyye.github.io/Summer_medical'
-  ];
+// =========================
+// ✅ Allowed Origins
+// =========================
+const allowedOrigins = [
+  "https://Louizyyye.github.io",
+  "https://Louzyyye.github.io/Summer_medical",
+];
 
+// =========================
+// ✅ App Setup
+// =========================
 const app = express();
-app.use(cors({
-  origin: ["https://louizyyye.github.io"],  // ✅ NOT .github.com
-  methods: ["GET","PUT","OPTIONS","DELETE", "POST"],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "PUT", "OPTIONS", "DELETE", "POST"],
+    credentials: true,
+  })
+);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-
-// ✅ Must come BEFORE any routes
-app.use(express.json()); // parses JSON request bodies
-app.use(express.urlencoded({ extended: true })); // parses form data
-
-
-// ✅ Add this base prefix
-const router = express.Router();
-
-router.post("/register", (req, res) => {
-  res.json({ success: true, message: "Registered + OTP sent successfully" });
-});
-
-router.post("/verify-otp", (req, res) => {
-  res.json({ success: true, message: "OTP verified successfully" });
-});
-
-app.use("/api", router); // <-- ✅ Mount API routes
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log("🚀 Server running");
-});
-
-// ✅ Connect to PostgreSQL
+// =========================
+// ✅ PostgreSQL Connection
+// =========================
 const pool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT || 5432,
@@ -50,52 +37,80 @@ const pool = new Pool({
   database: process.env.DB_NAME,
 });
 
-pool.connect()
+pool
+  .connect()
   .then(() => console.log("✅ Connected to PostgreSQL Database"))
   .catch((err) => console.error("❌ PostgreSQL Connection Error:", err));
 
-// ✅ Initialize Africa's Talking
+// =========================
+// ✅ Africa’s Talking Setup
+// =========================
 const africastalking = Africastalking({
   apiKey: process.env.AT_API_KEY,
   username: process.env.AT_USERNAME,
 });
+
 const sms = africastalking.SMS;
 
-// ✅ Send OTP Endpoint
-app.post("/register", async (req, res) => {
-  const { firstName, lastName, email, phone, password } = req.body;
-  try {
-    // send OTP or store user
-    res.json({ success: true, message: "OTP sent successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
+// =========================
+// ✅ ROUTES
+// =========================
+
+// Root route
+app.get("/", (_, res) => {
+  res.send("✅ Summer Medical Backend (PostgreSQL + Africa's Talking) is running");
 });
 
+// Simple registration route
+app.post("/api/register", (req, res) => {
+  res.json({ success: true, message: "Registered + OTP sent successfully" });
+});
+
+// ✅ SEND OTP
 app.post("/api/send-otp", async (req, res) => {
   try {
     const { phone } = req.body;
-    if (!phone)
+
+    if (!phone) {
       return res.status(400).json({ success: false, message: "Phone number required" });
+    }
 
-    const otp = require("crypto").randomInt(100000, 999999);
-    const message = `Your Summer Medical verification code is ${otp}`;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const message = `Your verification code is ${otp}`;
 
-    const result = await sms.send({
+    // Send SMS
+    const response = await sms.send({
       to: [phone],
       message,
-      from: process.env.AT_SENDER_ID || "",
+      from: process.env.AFRICASTALKING_SENDER_ID || "AFRICASTKNG",
     });
 
-// ✅ Verify OTP Endpoint
+    console.log("✅ SMS Response:", response);
+
+    // Store OTP in DB
+    await pool.query(
+      "INSERT INTO otps(phone, code, created_at) VALUES($1, $2, NOW())",
+      [phone, otp]
+    );
+
+    res.status(200).json({ success: true, message: "OTP sent successfully" });
+  } catch (err) {
+    console.error("❌ OTP Error:", err);
+    res.status(500).json({ success: false, message: "Failed to send OTP", error: err.message });
+  }
+});
+
+// ✅ VERIFY OTP
 app.post("/api/verify-otp", async (req, res) => {
   try {
     const { phone, otp } = req.body;
-    if (!phone || !otp)
-      return res.status(400).json({ success: false, message: "Phone and OTP required" });
 
-    // Find OTP in database
+    if (!phone || !otp) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Phone and OTP are required" });
+    }
+
     const result = await pool.query(
       "SELECT * FROM otps WHERE phone = $1 ORDER BY created_at DESC LIMIT 1",
       [phone]
@@ -107,7 +122,6 @@ app.post("/api/verify-otp", async (req, res) => {
 
     const storedOtp = result.rows[0].code;
 
-    // ✅ Compare codes
     if (storedOtp === otp) {
       return res.json({ success: true, message: "OTP verified successfully" });
     } else {
@@ -119,34 +133,19 @@ app.post("/api/verify-otp", async (req, res) => {
   }
 });
 
-    // Optional: store OTP
-    await pool.query(
-      "INSERT INTO otps(phone, code, created_at) VALUES($1, $2, NOW())",
-      [phone, otp]
-    );
+// =========================
+// ✅ Server Start
+// =========================
+const PORT = process.env.PORT || 3000;
 
-    console.log("📲 OTP sent:", result);
-    res.json({ success: true, message: "OTP sent successfully" });
-  } catch (error) {
-    console.error("❌ OTP Error:", error);
-    res.status(500).json({ success: false, message: "Failed to send OTP" });
-  }
-});
-
-// ✅ Root route
-app.get("/", (_, res) => {
-  res.send("✅ Summer Medical Backend (PostgreSQL + Africa's Talking) is running");
-});
-
-// ✅ Start server
-const PORT = process.env.PORT || 3000; // fallback for local dev
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-}).on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(`❌ Port ${PORT} is already in use.`);
-  } else {
-    console.error(err);
-  }
-});
+app
+  .listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  })
+  .on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`❌ Port ${PORT} is already in use.`);
+    } else {
+      console.error(err);
+    }
+  });

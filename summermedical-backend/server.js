@@ -21,35 +21,23 @@ app.post("/api/send-otp", async (req, res) => {
   try {
     const { phone } = req.body;
 
-    if (!phone) {
-      return res.status(400).json({ success: false, message: "Phone number is required" });
-    }
+    if (!phone) return res.status(400).json({ error: "Phone number required" });
 
-    // Generate random 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Send SMS using Africa's Talking
-    const sms = AT.SMS;
-    const result = await sms.send({
-      to: phone,
-      message: `Your Summer Medical OTP is ${otp}`,
-      from: process.env.AT_SENDER_ID,
+    const message = `Your verification code is ${otp}`;
+
+    const response = await sms.send({
+      to: [phone],
+      message,
+      from: process.env.AFRICASTALKING_SENDER_ID || "AFRICASTKNG", // 👈 FIX HERE
     });
 
-    console.log("✅ SMS sent successfully:", result);
-
-    res.status(200).json({
-      success: true,
-      message: "OTP sent successfully",
-      otp, // only for testing
-    });
-  } catch (error) {
-    console.error("❌ Error sending OTP:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to send OTP",
-      error: error.message,
-    });
+    console.log("✅ SMS Response:", response);
+    res.status(200).json({ success: true, message: "OTP sent successfully" });
+  } catch (err) {
+    console.error("❌ OTP Error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
