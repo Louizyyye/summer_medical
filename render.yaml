@@ -11,7 +11,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value:3000
+        value: 3000
       - key: CORS_ORIGIN
         value: https://louizyyye.github.io
 
@@ -34,8 +34,6 @@ services:
         value: atsk_824efeb296fdfab2cfa893b2e3291ecbac621cb450a67c1004b9707289f1c7fd0b95546d
       - key: AT_USERNAME
         value: casterlui
-      - key: AT_SENDER_ID
-        value:
 
 databases:
   - name: summer_medical
