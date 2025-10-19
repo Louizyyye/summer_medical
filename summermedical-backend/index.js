@@ -32,7 +32,7 @@ router.post("/verify-otp", (req, res) => {
 
 app.use("/api", router); // <-- ✅ Mount API routes
 
-app.listen(process.env.PORT , () => {
+app.listen(process.env.PORT || 3000, () => {
   console.log("🚀 Server running");
 });
 
@@ -134,5 +134,14 @@ app.get("/", (_, res) => {
 });
 
 // ✅ Start server
-const PORT = process.env.PORT ;
-app.listen(PORT, "0.0.0.0",() => console.log(`🚀 Server running on port ${PORT}`));
+const PORT = process.env.PORT || 3000; // fallback for local dev
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+}).on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(`❌ Port ${PORT} is already in use.`);
+  } else {
+    console.error(err);
+  }
+});
