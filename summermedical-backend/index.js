@@ -18,6 +18,24 @@ app.use(cors({
 }));
 app.use(express.json());
 
+
+// ✅ Add this base prefix
+const router = express.Router();
+
+router.post("/register", (req, res) => {
+  res.json({ success: true, message: "Registered + OTP sent successfully" });
+});
+
+router.post("/verify-otp", (req, res) => {
+  res.json({ success: true, message: "OTP verified successfully" });
+});
+
+app.use("/api", router); // <-- ✅ Mount API routes
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log("🚀 Server running");
+});
+
 // ✅ Connect to PostgreSQL
 const pool = new Pool({
   host: process.env.DB_HOST,
