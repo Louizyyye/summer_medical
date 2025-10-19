@@ -89,57 +89,30 @@
 <script>
 const API_BASE_URL = "https://summermedical-backend.onrender.com/api";
 
-document.getElementById('registrationForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const formData = {
-    firstName: e.target[0].value,
-    lastName: e.target[1].value,
-    email: e.target[2].value,
-    phone: e.target[3].value.trim(),
-    password: e.target[4].value
-  };
-
-  // ✅ Validate Kenyan phone number (+254 + 9 digits)
-  const phoneRegex = /^\+254\d{9}$/;
-  if (!phoneRegex.test(formData.phone)) {
-    alert("Please enter a valid Kenyan phone number starting with +254 followed by 9 digits.");
-    return;
-  }
-
+// Step 1: Send OTP
+async function sendOtp(phone) {
   try {
-    // Send form data to backend (register + OTP send)
-    const res = await fetch(`${API_BASE_URL}/register`, {
+    const response = await fetch(`${API_BASE_URL}/send-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData)
+      body: JSON.stringify({ phone }),
     });
 
-    const data = await res.json();
-    console.log(data);
-
-    if (data.success) {
-      alert("OTP sent successfully! Check your phone.");
-      document.getElementById('otpVerification').classList.remove('hidden');
-    } else {
-      alert(data.message || "Registration failed");
+    if (!response.ok) {
+      throw new Error("Failed to send OTP");
     }
-  } catch (err) {
-    alert("Server error — please try again later.");
-    console.error(err);
+
+    const data = await response.json();
+    console.log("✅ OTP sent:", data);
+    return data; // could contain OTP token or status
+  } catch (error) {
+    console.error("❌ Error sending OTP:", error);
+    throw error;
   }
-});
+}
 
-// ✅ OTP Verification Logic
-document.getElementById("verifyOtp").onclick = async function () {
-  const phone = document.getElementById("phone").value.trim();
-  const otp = document.getElementById("otp").value.trim();
-
-  if (!otp) {
-    alert("Please enter the OTP you received.");
-    return;
-  }
-
+// Step 2: Verify OTP
+async function verifyOtp(phone, otp) {
   try {
     const response = await fetch(`${API_BASE_URL}/verify-otp`, {
       method: "POST",
@@ -147,19 +120,94 @@ document.getElementById("verifyOtp").onclick = async function () {
       body: JSON.stringify({ phone, otp }),
     });
 
-    const data = await response.json();
-
-    if (data.success) {
-      alert("✅ OTP verified successfully! Registration complete.");
-      // window.location.href = "/dashboard.html"; // optional redirect
-    } else {
-      alert("❌ Invalid or expired OTP. Please try again.");
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "OTP verification failed");
     }
+
+    const data = await response.json();
+    console.log("✅ OTP verified:", data);
+    return data; // typically { success: true }
   } catch (error) {
-    console.error("Error verifying OTP:", error);
-    alert("Server error while verifying OTP.");
+    console.error("❌ Error verifying OTP:", error);
+    throw error;
   }
-};
+}
+
+// Step 3: Register patient
+async function registerPatient(name, phone, email, password) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, email, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to register patient");
+    }
+
+    const data = await response.json();
+    console.log("✅ Registration successful:", data);
+    return data;
+  } catch (error) {
+    console.error("❌ Registration error:", error);
+    throw error;
+  }
+}
+
+// Handle form submission
+document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = {
+    firstName: e.target[0].value.trim(),
+    lastName: e.target[1].value.trim(),
+    email: e.target[2].value.trim(),
+    phone: e.target[3].value.trim(),
+    password: e.target[4].value,
+  };
+
+  // Validate Kenyan phone number (+254 + 9 digits)
+  const phoneRegex = /^\+254\d{9}$/;
+  if (!phoneRegex.test(formData.phone)) {
+    alert("Please enter a valid Kenyan phone number starting with +254 followed by 9 digits.");
+    return;
+  }
+
+  try {
+    // Step 1: Send OTP
+    await sendOtp(formData.phone);
+
+    // Step 2: Ask user for OTP
+    const otp = prompt("Enter the OTP sent to your phone:");
+
+    if (!otp || otp.trim() === "") {
+      alert("OTP is required to proceed.");
+      return;
+    }
+
+    // Step 3: Verify OTP
+    const otpResult = await verifyOtp(formData.phone, otp);
+    if (!otpResult.success) {
+      alert("OTP verification failed. Cannot register.");
+      return;
+    }
+
+    // Step 4: Register patient
+    const fullName = `${formData.firstName} ${formData.lastName}`;
+    const registrationData = await registerPatient(fullName, formData.phone, formData.email, formData.password);
+
+    alert("Registration successful!");
+    console.log("Registered patient data:", registrationData);
+
+    // Optional: reset form
+    e.target.reset();
+  } catch (error) {
+    alert("❌ Registration failed. See console for details.");
+  }
+});
 </script>
 
 <style>
