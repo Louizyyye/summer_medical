@@ -50,8 +50,6 @@ pool
 const africastalking = Africastalking({
   apiKey: process.env.AT_API_KEY,
   username: process.env.AT_USERNAME,
-  from: process.env.AFRICASTALKING_SENDER_ID || "AFRICASTKNG"
-
 });
 
 const sms = africastalking.SMS;
