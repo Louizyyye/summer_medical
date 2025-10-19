@@ -1,0 +1,64 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Summer Medical Center</title><link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"><script defer="defer" src="./js/app.js"></script></head><body class="bg-gray-100"><header class="bg-blue-600 text-white p-6"><h1 class="text-4xl font-bold">Summer Medical Center</h1><p class="text-lg">Discover Your Future in Medicine!</p><nav class="mt-4"><ul class="flex space-x-4"><li><a href="#about" class="hover:underline">About</a></li><li><a href="#contacts" class="hover:underline">Contacts</a></li><li><a href="#registration" class="hover:underline">Registration</a></li><li><a href="#faq" class="hover:underline">FAQ</a></li><li><a href="#services" class="hover:underline">Services</a></li></ul></nav></header><main class="p-6"><section class="hero bg-white p-6 rounded shadow-md"><img src="https://via.placeholder.com/800x400" alt="Medical Exploration" class="w-full rounded"><p class="mt-4">At Summer Medical Center, we offer laboratory services, orthopedics, and sonography to help you explore the medical field.</p><a href="#registration" class="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded">Register Now!</a></section><section id="about" class="mt-6"><h2 class="text-2xl font-bold">Health is Wealth</h2><p>Our center is dedicated to long-term investments in personal health. We are open from 9 AM to 5 PM, located at 123 Health St. Our overall objective is to empower students with knowledge and skills in the medical field.</p></section><section id="services" class="mt-6"><h2 class="text-2xl font-bold">Program Details</h2><ul class="list-disc ml-6"><li>Anatomy & Physiology</li><li>Medical Terminology Basics</li><li>Hands-on Simulations</li><li>Guest Lectures from Medical Professionals</li><li>Shadowing Opportunities (if applicable)</li></ul></section><section class="max-w-md mx-auto mt-10"><form id="registrationForm" class="bg-white p-6 rounded shadow-md"><input id="firstName" placeholder="First Name" required class="block w-full mb-4 p-2 border"> <input id="lastName" placeholder="Last Name" required class="block w-full mb-4 p-2 border"> <input type="email" id="email" placeholder="Email Address" required class="block w-full mb-4 p-2 border"> <input type="tel" id="phone" placeholder="Phone Number (+254...)" required class="block w-full mb-4 p-2 border"> <input type="password" id="password" placeholder="Password" required class="block w-full mb-4 p-2 border"> <input type="password" id="confirmPassword" placeholder="Confirm Password" required class="block w-full mb-4 p-2 border"><div class="mb-4"><label><input type="radio" name="subscription" value="Basic" required> Basic - Kes 500 (includes summer online care access)</label><br><label><input type="radio" name="subscription" value="Premium" required> Premium - Kes 5000 (includes access + exclusive materials)</label></div><button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded w-full">Register</button></form><div id="otpVerification" class="hidden mt-4"><p class="text-green-700">Verification Code Sent to Your Phone Number.</p><input id="otp" placeholder="Enter OTP" class="block w-full mb-4 p-2 border"> <button id="verifyOtp" class="bg-blue-600 text-white py-2 px-4 rounded w-full">Verify OTP</button></div></section><section id="faq" class="mt-6"><h2 class="text-2xl font-bold">Frequently Asked Questions</h2><ul class="list-disc ml-6"><li>What is the duration of the program?</li><li>Are there any prerequisites for registration?</li><li>Can I change my subscription plan after registration?</li></ul></section></main><footer class="bg-blue-600 text-white p-6 mt-6"><p>&copy; 2023 Summer Medical Center. All rights reserved.</p><p>Contact us: info@summermedicalcenter.com | Phone: 123-456-7890</p><p>Follow us on <a href="#" class="underline">Facebook</a>, <a href="#" class="underline">Twitter</a>, <a href="#" class="underline">Instagram</a></p></footer><script>const API_BASE_URL = "https://summermedical-backend.onrender.com/api";
+
+document.getElementById('registrationForm').onsubmit = async function (event) {
+  event.preventDefault();
+
+  const phoneInput = document.getElementById("phone").value.trim();
+
+  // ✅ Kenyan number validation
+  const phoneRegex = /^\+254\d{9}$/;
+  if (!phoneRegex.test(phoneInput)) {
+    alert("Please enter a valid Kenyan phone number starting with +254 followed by 9 digits.");
+    return;
+  }
+
+  try {
+    // Send to backend
+    const response = await fetch(`${API_BASE_URL}/send-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: phoneInput }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      alert("OTP sent successfully! Check your phone.");
+      document.getElementById('otpVerification').classList.remove('hidden');
+    } else {
+      alert("Failed to send OTP. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    alert("Server error — please try again later.");
+  }
+};
+document.getElementById("verifyOtp").onclick = async function () {
+  const phone = document.getElementById("phone").value.trim();
+  const otp = document.getElementById("otp").value.trim();
+
+  if (!otp) {
+    alert("Please enter the OTP you received.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, otp }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert("✅ OTP verified successfully! Registration complete.");
+      // You can now redirect the user, e.g.:
+      // window.location.href = "/dashboard.html";
+    } else {
+      alert("❌ Invalid or expired OTP. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    alert("Server error while verifying OTP.");
+  }
+};</script><style>.hidden { display: none; }</style></body></html>

@@ -1,0 +1,1 @@
+fetch("https://summermedical-backend.onrender.com/api/patients").then(e=>{if(!e.ok)throw new Error("Failed to fetch patients: "+e.status);return e.json()}).then(e=>{console.log("✅ Patients data received:",e)}).catch(e=>{console.error("❌ Error fetching patients:",e)});
