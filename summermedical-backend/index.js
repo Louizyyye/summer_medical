@@ -6,8 +6,8 @@ const { Pool } = require("pg");
 const Africastalking = require("africastalking");
 
 const allowed = [
-  'https://Louizyyye.github.com',
-  'https://Louzyyye.github.com/Summer_medical'
+  'https://Louizyyye.github.io',
+  'https://Louzyyye.github.io/Summer_medical'
   ];
 
 const app = express();
