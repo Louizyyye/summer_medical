@@ -1,0 +1,61 @@
+# === Config ===
+$API_BASE_URL = "https://summermedical-backend.onrender.com/api"
+$phone = "+254720308738"         # Replace with your test phone number
+$firstName = "luis"
+$lastName = "mpita"
+$email = "mpitaluiss@gmail.com"
+$password = "prettyfeaR1!"
+
+# === Step 1: Send OTP ===
+Write-Host "➡ Sending OTP to $phone..."
+$sendOtpBody = @{ phone = $phone } | ConvertTo-Json
+
+$sendOtpResponse = Invoke-RestMethod -Uri "$API_BASE_URL/send-otp" `
+                                    -Method POST `
+                                    -Body $sendOtpBody `
+                                    -ContentType "application/json"
+
+Write-Host "✅ OTP Response:"
+$sendOtpResponse | ConvertTo-Json -Depth 5
+Write-Host "`n"
+
+# === Step 2: Ask user to enter OTP ===
+$otp = Read-Host "Enter the OTP received on $phone"
+
+# === Step 3: Verify OTP ===
+Write-Host "➡ Verifying OTP..."
+$verifyOtpBody = @{
+    phone = $phone
+    otp   = $otp
+} | ConvertTo-Json
+
+$verifyOtpResponse = Invoke-RestMethod -Uri "$API_BASE_URL/verify-otp" `
+                                      -Method POST `
+                                      -Body $verifyOtpBody `
+                                      -ContentType "application/json"
+
+Write-Host "✅ OTP Verification Response:"
+$verifyOtpResponse | ConvertTo-Json -Depth 5
+Write-Host "`n"
+
+# === Step 4: Register Patient ===
+Write-Host "➡ Registering patient..."
+$registerBody = @{
+    firstName = $Luis
+    lastName  = $mpita
+    phone     = $+254720308739
+    email     = $mpitaluiss@gmail.com
+    password  = $prettyfeaR1!
+} | ConvertTo-Json
+
+try {
+    $registerResponse = Invoke-RestMethod -Uri "$API_BASE_URL/register" `
+                                         -Method POST `
+                                         -Body $registerBody `
+                                         -ContentType "application/json"
+    Write-Host "✅ Registration successful!"
+    $registerResponse | ConvertTo-Json -Depth 5
+} catch {
+    Write-Host "❌ Registration failed!"
+    Write-Host $_.Exception.Response.Content.ReadAsStringAsync().Result
+}
