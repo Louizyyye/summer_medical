@@ -16,13 +16,15 @@ const allowedOrigins = [
 // ✅ App Setup
 // =========================
 const app = express();
-app.use(
-  cors({
-    origin: allowedOrigins,
-    methods: ["GET", "PUT", "OPTIONS", "DELETE", "POST"],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: [
+    "https://louizyyye.github.io",
+    "https://louzyyye.github.io/Summer_medical"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -48,6 +50,8 @@ pool
 const africastalking = Africastalking({
   apiKey: process.env.AT_API_KEY,
   username: process.env.AT_USERNAME,
+  from: process.env.AFRICASTALKING_SENDER_ID || "AFRICASTKNG"
+
 });
 
 const sms = africastalking.SMS;
