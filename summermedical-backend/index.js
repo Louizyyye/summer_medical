@@ -32,7 +32,7 @@ router.post("/verify-otp", (req, res) => {
 
 app.use("/api", router); // <-- ✅ Mount API routes
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT , () => {
   console.log("🚀 Server running");
 });
 
@@ -134,5 +134,5 @@ app.get("/", (_, res) => {
 });
 
 // ✅ Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT ;
 app.listen(PORT, "0.0.0.0",() => console.log(`🚀 Server running on port ${PORT}`));
