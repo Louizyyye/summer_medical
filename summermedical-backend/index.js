@@ -12,16 +12,9 @@ const allowed = [
 
 const app = express();
 app.use(cors({
-  origin: function(origin, callback) {
-    // allow requests with no origin (mobile apps, curl)
-    if (!origin) return callback(null, true);
-    if (allowed.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  methods: ['GET','POST','PUT','DELETE','OPTIONS']
+  origin: ["https://louizyyye.github.io"],  // ✅ NOT .github.com
+  methods: ["GET","PUT","OPTIONS","DELETE", "POST"],
+  credentials: true
 }));
 app.use(express.json());
 
@@ -46,6 +39,17 @@ const africastalking = Africastalking({
 const sms = africastalking.SMS;
 
 // ✅ Send OTP Endpoint
+app.post("/register", async (req, res) => {
+  const { firstName, lastName, email, phone, password } = req.body;
+  try {
+    // send OTP or store user
+    res.json({ success: true, message: "OTP sent successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 app.post("/api/send-otp", async (req, res) => {
   try {
     const { phone } = req.body;
