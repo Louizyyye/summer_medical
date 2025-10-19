@@ -59,3 +59,6 @@ try {
     Write-Host "❌ Registration failed!"
     Write-Host $_.Exception.Response.Content.ReadAsStringAsync().Result
 }
+curl -X POST https://summermedical-backend.onrender.com/api/send-otp \
+  -H "Content-Type: application/json" \
+  -d '{"phone": "+254720308738"}'

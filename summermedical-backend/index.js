@@ -19,6 +19,11 @@ app.use(cors({
 app.use(express.json());
 
 
+// ✅ Must come BEFORE any routes
+app.use(express.json()); // parses JSON request bodies
+app.use(express.urlencoded({ extended: true })); // parses form data
+
+
 // ✅ Add this base prefix
 const router = express.Router();
 
