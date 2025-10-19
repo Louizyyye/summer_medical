@@ -5,8 +5,24 @@ const cors = require("cors");
 const { Pool } = require("pg");
 const Africastalking = require("africastalking");
 
+const allowed = [
+  'https://Louizyyye.github.com',
+  'https://Louzyyye.github.com/Summer_medical'
+  ];
+
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: function(origin, callback) {
+    // allow requests with no origin (mobile apps, curl)
+    if (!origin) return callback(null, true);
+    if (allowed.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET','POST','PUT','DELETE','OPTIONS']
+}));
 app.use(express.json());
 
 // ✅ Connect to PostgreSQL
